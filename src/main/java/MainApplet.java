@@ -12,7 +12,7 @@ import java.awt.event.ActionListener;
 * You can do major UI control and some visualization in this class.  
 */
 @SuppressWarnings("serial")
-public class MainApplet extends PApplet {
+public class MainApplet extends PApplet { 
 	private String path = "main/resources/";
 	private String file = "starwars-episode-1-interactions.json";
 	private String address = path.concat(file);
@@ -27,7 +27,7 @@ public class MainApplet extends PApplet {
 	private boolean is_dragging = false;
 	private int now_dragging;
 	
-	public void setup() {
+	public void setup() {  // Initialize
 
 		size(width, height);
 		circle_x = width / 2;
@@ -54,7 +54,7 @@ public class MainApplet extends PApplet {
 		
 	}
 	
-	public void draw() {
+	public void draw() {  //draw all the things here
 		background(255);
 		stroke(48, 139, 206);
 		//strokeWeight(5); 
@@ -63,7 +63,7 @@ public class MainApplet extends PApplet {
 		
 		for(Character character:characters) {
 			fill(0, 102, 153);
-			if (dist(character.x, character.y, mouseX, mouseY) <= character.radius) {
+			if (dist(character.x, character.y, mouseX, mouseY) <= character.radius) { // check whether we can catch the liitle circle
 				character.setMouseIn();
 			}
 			character.display();
@@ -78,7 +78,7 @@ public class MainApplet extends PApplet {
 				dest_x = characters.get(i).getTargets().get(j).x;
 				dest_y = characters.get(i).getTargets().get(j).y;
 				fill(255);
-				if (dist(src_x, src_y, circle_x, circle_y) <= radius+0.1 && dist(dest_x, dest_y, circle_x, circle_y) <= radius+0.1) {
+				if (dist(src_x, src_y, circle_x, circle_y) <= radius+0.1 && dist(dest_x, dest_y, circle_x, circle_y) <= radius+0.1) { // if the little circles are in the great circle,then they can have the relation line
 					line(src_x, src_y, dest_x, dest_y);
 				}
 			}
@@ -101,7 +101,7 @@ public class MainApplet extends PApplet {
 		
 	}
 	
-	public void addInCircle() {
+	public void addInCircle() { // We do the things when the little circles are adding to the great circle
 		int count = 0;
 		for (Character  character:characters) {
 			if (dist(character.x, character.y, circle_x, circle_y) <= radius+0.1) {
@@ -112,19 +112,24 @@ public class MainApplet extends PApplet {
 		}
 	}
 	
-	public void mouseDragged() {
+	public void mouseDragged() { // use the mouse to drag the little circles
 		for(int i=0; i<characters.size(); i++) {
-			if (dist(characters.get(i).x, characters.get(i).y, mouseX, mouseY) <= characters.get(i).radius && is_dragging == false) {
+			if (dist(characters.get(i).x, characters.get(i).y, mouseX, mouseY) <= characters.get(i).radius && is_dragging == false) { // if we can drag one little circles, then we cannot drag others
 				now_dragging = i;
 				is_dragging = true;
 				break;
 			}
 		}
-		characters.get(now_dragging).x = mouseX;
-		characters.get(now_dragging).y = mouseY;
+		if (is_dragging == true) { // keep dragging
+			characters.get(now_dragging).x = mouseX;
+			characters.get(now_dragging).y = mouseY;
+			//if (dist(mouseX, mouseY, circle_x, circle_y) <= radius+0.1 && is_dragging == true) {
+				
+			//}
+		}
 	}
 	
-	public void mouseReleased() {
+	public void mouseReleased() {  // do the things when we release the mouse.  If we release inside the great circle, then arrange the little circles.  If we release outside the great circle, then put it back to initial place.
 		num_in_circle = 0;
 		for(int i=0; i<characters.size(); i++) {
 			if (dist(characters.get(i).x, characters.get(i).y, circle_x, circle_y) <= radius+0.1) {
@@ -138,7 +143,7 @@ public class MainApplet extends PApplet {
 		addInCircle();
 	}
 	
-	private void loadData(){
+	private void loadData(){ // Load the data in
 		int x=0, y=0;
 		data = loadJSONObject(address);
 		nodes = data.getJSONArray("nodes");
