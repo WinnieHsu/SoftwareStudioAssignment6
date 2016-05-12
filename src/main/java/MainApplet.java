@@ -6,7 +6,7 @@ import processing.core.PApplet;
 import processing.data.JSONArray;
 import processing.data.JSONObject;
 import controlP5.*;
-
+import java.awt.event.ActionListener;
 /**
 * This class is for sketching outcome using Processing
 * You can do major UI control and some visualization in this class.  
@@ -38,22 +38,22 @@ public class MainApplet extends PApplet {
 		cp5 = new ControlP5(this);
 		
 		cp5.addButton("addAll")
-			.setLabel("ADD ALL")
-			.setColorBackground(139)
-			.setPosition(width*3/4, height/20)
-			.setSize(100, 30);
+				.setLabel("ADD ALL")
+				.setColorBackground(139)
+				.setPosition(width*3/4, height/20)
+				.setSize(100, 30);
 		cp5.addButton("clear")
-			.setLabel("CLEAR")
-			.setColorBackground(139)
-			.setPosition(width*3/4, 80+height/20)
-			.setSize(100, 30);
+				.setLabel("CLEAR")
+				.setColorBackground(139)
+				.setPosition(width*3/4, 80+height/20)
+				.setSize(100, 30);
 		
 		characters = new ArrayList<Character>();
 		smooth();
 		loadData();
 		
 	}
-
+	
 	public void draw() {
 		background(255);
 		stroke(48, 139, 206);
@@ -114,14 +114,14 @@ public class MainApplet extends PApplet {
 	
 	public void mouseDragged() {
 		for(int i=0; i<characters.size(); i++) {
-			if (dist(characters.get(i).x, characters.get(i).y, mouseX, mouseY) <= characters.get(i).radius) {
+			if (dist(characters.get(i).x, characters.get(i).y, mouseX, mouseY) <= characters.get(i).radius && is_dragging == false) {
 				now_dragging = i;
-				characters.get(i).x = mouseX;
-				characters.get(i).y = mouseY;
 				is_dragging = true;
 				break;
 			}
 		}
+		characters.get(now_dragging).x = mouseX;
+		characters.get(now_dragging).y = mouseY;
 	}
 	
 	public void mouseReleased() {
