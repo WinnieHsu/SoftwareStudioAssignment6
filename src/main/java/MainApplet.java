@@ -16,22 +16,23 @@ public class MainApplet extends PApplet {
 	private String path = "main/resources/";
 	private String file = "starwars-episode-1-interactions.json";
 	private String address = path.concat(file);
-	
 	JSONObject data;
 	JSONArray nodes, links;
 	private ArrayList<Character> characters;
 	private ControlP5 cp5; 
 	private int epsNum = 1;
-	private int num_in_great_circle = 0;
+	private int num_in_circle = 0;
 	private float circle_x, circle_y, radius;
 	private final static int width = 1200, height = 650;
+	private boolean is_dragging = false;
+	private int now_dragging;
 	
 	public void setup() {
 
 		size(width, height);
 		circle_x = width / 2;
 		circle_y = height / 2;
-		radius = (width-50)/2;
+		radius = (width-50) / 4;
 		background(255);
 		//text("Star Wars 1", width/3, 5);
 		cp5 = new ControlP5(this);
@@ -58,10 +59,13 @@ public class MainApplet extends PApplet {
 		stroke(48, 139, 206);
 		//strokeWeight(5); 
 		text("Star Wars %d", width/3, 5, epsNum);
-		ellipse(circle_x, circle_y, radius, radius);
+		ellipse(circle_x, circle_y, 2*radius, 2*radius);
 		
 		for(Character character:characters) {
 			fill(0, 102, 153);
+			if (dist(character.x, character.y, mouseX, mouseY) <= character.radius) {
+				character.setMouseIn();
+			}
 			character.display();
 		}
 		
@@ -74,7 +78,9 @@ public class MainApplet extends PApplet {
 				dest_x = characters.get(i).getTargets().get(j).x;
 				dest_y = characters.get(i).getTargets().get(j).y;
 				fill(255);
-				line(src_x, src_y, dest_x, dest_y);
+				if (dist(src_x, src_y, circle_x, circle_y) <= radius+0.1 && dist(dest_x, dest_y, circle_x, circle_y) <= radius+0.1) {
+					line(src_x, src_y, dest_x, dest_y);
+				}
 			}
 		}
 	}
@@ -96,20 +102,40 @@ public class MainApplet extends PApplet {
 	}
 	
 	public void addInCircle() {
-		
-	}
-	
-	public void mousePressed() {
-		for(Character character:characters) {
-			if (dist(character.x, character.y, mouseX, mouseY) <= character.radius) {
-				character.x = mouseX;
-				character.y = mouseY;
+		int count = 0;
+		for (Character  character:characters) {
+			if (dist(character.x, character.y, circle_x, circle_y) <= radius+0.1) {
+				character.x = circle_x + radius * cos((float)(2*PI* count) / num_in_circle);
+				character.y = circle_y + radius * sin((float)(2*PI* count) / num_in_circle);
+				count++;
 			}
 		}
 	}
 	
-	public void mouseDragger() {
-
+	public void mouseDragged() {
+		for(int i=0; i<characters.size(); i++) {
+			if (dist(characters.get(i).x, characters.get(i).y, mouseX, mouseY) <= characters.get(i).radius) {
+				now_dragging = i;
+				characters.get(i).x = mouseX;
+				characters.get(i).y = mouseY;
+				is_dragging = true;
+				break;
+			}
+		}
+	}
+	
+	public void mouseReleased() {
+		num_in_circle = 0;
+		for(int i=0; i<characters.size(); i++) {
+			if (dist(characters.get(i).x, characters.get(i).y, circle_x, circle_y) <= radius+0.1) {
+				num_in_circle++;
+			} else {
+				characters.get(i).x = characters.get(i).getInitialX();
+				characters.get(i).y = characters.get(i).getInitialY();
+			}
+		}
+		is_dragging = false;
+		addInCircle();
 	}
 	
 	private void loadData(){
@@ -121,10 +147,7 @@ public class MainApplet extends PApplet {
 			
 			String name = node.getString("name");
 			int value = node.getInt("value");
-			
-			Character input = new Character(this, name, 10+(x+5)*60, 10+(y+5)*60);
-			x = (x+1)%3;
-			y = (y+1)%9;
+			Character input = new Character(this, name, 20+(i%4)*60, 20+(i/4)*60);
 			this.characters.add(input);
 		}
 		
